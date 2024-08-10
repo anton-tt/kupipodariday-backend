@@ -39,7 +39,7 @@ dependencies:
 
 devDependencies:
   '@nestjs/cli': 9.0.0
-  '@nestjs/schematics': 9.0.1_typescript@4.7.4
+  '@nestjs/schematics': 9.0.0_typescript@4.7.4
   '@nestjs/testing': 9.0.9_sj5e7nbqtflwdk3n72r6mvqvo4
   '@types/express': 4.17.13
   '@types/jest': 28.1.4
