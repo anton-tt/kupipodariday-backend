@@ -33,13 +33,13 @@ export class Wish extends BaseEntity {
   @IsDecimal({ decimal_digits: '2' })
   price: number;
 
-  @Column('decimal', { scale: 2 })
+  @Column({ type: 'decimal', scale: 2, default: 0 })
   @IsNumber()
   raised: number;
 
-  @ManyToOne(() => User, (user) => user.wishes)
-  @IsNotEmpty()
-  owner: User;
+  @Column({ type: 'integer', default: 0 })
+  @IsInt()
+  copied: number;
 
   @Column()
   @IsString()
@@ -49,13 +49,13 @@ export class Wish extends BaseEntity {
   })
   description: string;
 
+  @ManyToOne(() => User, (user) => user.wishes)
+  @IsNotEmpty()
+  owner: User;
+
   @OneToMany(() => Offer, (offer) => offer.item)
   @IsArray()
   offers: Array<Offer>;
-
-  @Column({ type: 'integer', default: 0 })
-  @IsInt()
-  copied: number;
 
   @ManyToMany(() => Wishlist, (wishlist) => wishlist.items)
   @IsArray()

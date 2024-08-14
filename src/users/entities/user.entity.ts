@@ -16,7 +16,7 @@ export class User extends BaseEntity {
   @IsString()
   about: string;
 
-  @Column({ default: ' https://i.pravatar.cc/300' })
+  @Column({ default: 'https://i.pravatar.cc/300' })
   @IsUrl()
   avatar: string;
 
