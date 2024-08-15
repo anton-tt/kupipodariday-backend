@@ -34,7 +34,6 @@ export class User extends BaseEntity {
   wishes: Array<Wish>;
 
   @OneToMany(() => Offer, (offer) => offer.user)
-  @JoinTable()
   @IsArray()
   offers: Array<Offer>;
 

@@ -43,7 +43,7 @@ export class UsersService {
     if (!user) {
       throw new NotFoundException('Пользователь с этим именем не найден в БД.');
     }
-    return this._getNewUserPublicProfileResponseDto(user);
+    return this.getNewUserPublicProfileResponseDto(user);
   }
 
   async getById(id: number): Promise<UserProfileResponseDto> {
@@ -126,9 +126,7 @@ export class UsersService {
     }
     const wishes: Array<Wish> = user.wishes;
     if (wishes.length === 0) {
-      throw new NotFoundException(
-        'У пользователя нет ниодного запроса на подарок.',
-      );
+      console.log('У пользователя нет ниодного запроса на подарок.');
     }
     return wishes.map((wish) => {
       return this._getNewWishResponseDto(wish);
@@ -180,9 +178,7 @@ export class UsersService {
     );
   }
 
-  _getNewUserPublicProfileResponseDto(
-    user: User,
-  ): UserPublicProfileResponseDto {
+  getNewUserPublicProfileResponseDto(user: User): UserPublicProfileResponseDto {
     return new UserPublicProfileResponseDto(
       user.id,
       user.username,
@@ -205,7 +201,7 @@ export class UsersService {
       wish.raised,
       wish.copied,
       wish.description,
-      this._getNewUserPublicProfileResponseDto(wish.owner),
+      this.getNewUserPublicProfileResponseDto(wish.owner),
       wish.offers,
       wish.wishlists,
     );

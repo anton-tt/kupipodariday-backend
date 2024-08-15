@@ -1,7 +1,6 @@
 import {
   Controller,
   UseGuards,
-  Headers,
   Request,
   Param,
   Body,
@@ -25,11 +24,6 @@ import {
   COPY_PATH,
 } from '../utils/consts';
 import { WishResponseDto } from './dto/response-wish.dto';
-/*import { UserProfileResponseDto } from './dto/private-response-user.dto';
-import { UserPublicProfileResponseDto } from './dto/public-response-user.dto';
-import { FindIdUserDto } from './dto/find-id-user.dto';
-import { FindUserDto } from './dto/find-user.dto';
-import { SignupUserResponseDto } from './dto/signup-response-user.dto';*/
 
 @Controller(WISHES_PATH)
 export class WishesController {
@@ -46,17 +40,13 @@ export class WishesController {
 
   @UseGuards(JwtGuard)
   @Get(LAST_PATCH)
-  async getLastWish(
-    @Request() req: Request & { user: FindIdUserDto },
-  ): Promise<Array<WishResponseDto>> {
+  async getLastWish(): Promise<Array<WishResponseDto>> {
     return this.wishesService.getLastWishResponseDto();
   }
 
   @UseGuards(JwtGuard)
   @Get(TOP_PATCH)
-  async getTopWish(
-    @Request() req: Request & { user: FindIdUserDto },
-  ): Promise<Array<WishResponseDto>> {
+  async getTopWish(): Promise<Array<WishResponseDto>> {
     return this.wishesService.getTopWishResponseDto();
   }
 

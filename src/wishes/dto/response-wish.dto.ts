@@ -55,7 +55,6 @@ export class WishResponseDto {
     this.copied = copied;
     this.description = description;
     this.owner = owner;
-
     this.offers = offers;
     this.wishlists = wishlists;
   }

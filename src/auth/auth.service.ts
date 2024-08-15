@@ -12,16 +12,19 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async validateUser(username: string, password: string): Promise<any> {
+  async validateUser(username: string, password: string): Promise<User | null> {
     const user: User = await this.usersService.getUserByName(username);
     if (user && user.password === password) {
-      const { password, ...result } = user;
-      return result;
+      return user;
     }
     return null;
   }
 
-  auth(user: SigninUserDto): SigninUserResponseDto {
+  async auth(loginData: SigninUserDto): Promise<SigninUserResponseDto> {
+    const user: User = await this.validateUser(
+      loginData.username,
+      loginData.password,
+    );
     const payload = { username: user.username, sub: user.id };
     const access_token: string = this.jwtService.sign(payload);
     return new SigninUserResponseDto(access_token);

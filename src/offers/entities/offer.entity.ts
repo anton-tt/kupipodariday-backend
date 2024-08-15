@@ -1,5 +1,5 @@
-import { Entity, ManyToOne, Column, JoinTable } from 'typeorm';
-import { IsNumber, IsUrl, IsBoolean, IsNotEmpty } from 'class-validator';
+import { Entity, ManyToOne, Column } from 'typeorm';
+import { IsNumber, IsBoolean, IsNotEmpty } from 'class-validator';
 import { BaseEntity } from '../../utils/base.entity';
 import { Wish } from '../../wishes/entities/wish.entity';
 import { User } from '../../users/entities/user.entity';
@@ -11,8 +11,6 @@ export class Offer extends BaseEntity {
   user: User;
 
   @ManyToOne(() => Wish, (wish) => wish.offers)
-  @JoinTable()
-  @IsUrl()
   item: Wish;
 
   @Column('decimal', { scale: 2 })

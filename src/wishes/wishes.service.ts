@@ -12,11 +12,6 @@ import { PartialWishDto } from '../wishes/dto/partial-wish.dto';
 import { UsersService } from '../users/users.service';
 import { User } from '../users/entities/user.entity';
 import { WishResponseDto } from './dto/response-wish.dto';
-/*import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { UserProfileResponseDto } from './dto/private-response-user.dto';
-import { UserPublicProfileResponseDto } from './dto/public-response-user.dto';
-import { SignupUserResponseDto } from './dto/signup-response-user.dto';*/
 
 @Injectable()
 export class WishesService {
@@ -34,18 +29,14 @@ export class WishesService {
       ...wishData,
       owner: { id: userId },
     });
-    return this._getNewPartialWishDto(wish);
+    return this.getNewPartialWishDto(wish);
   }
 
   async update(id: number, wishData: UpdateWishDto): Promise<PartialWishDto> {
     let oldWish: Wish = await this.getById(id);
-    console.log(oldWish);
     oldWish = this._updateOldWish(wishData, oldWish);
-    console.log(oldWish);
     const wish: Wish = await this.wishesRepository.save(oldWish);
-    console.log(wish);
-    console.log(this._getNewPartialWishDto(wish));
-    return this._getNewPartialWishDto(wish);
+    return this.getNewPartialWishDto(wish);
   }
 
   async getById(id: number): Promise<Wish> {
@@ -117,7 +108,7 @@ export class WishesService {
     newWish = await this.wishesRepository.save(newWish);
     wish.copied += 1;
     await this.wishesRepository.save(wish);
-    return this._getNewPartialWishDto(newWish);
+    return this.getNewPartialWishDto(newWish);
   }
 
   _updateOldWish(wishData: UpdateWishDto, oldWish: Wish): Wish {
@@ -129,12 +120,12 @@ export class WishesService {
     raised && oldWish.raised !== raised && (oldWish.raised = raised);
     copied && oldWish.copied !== copied && (oldWish.copied = copied);
     description &&
-      wishData.description !== description &&
-      (wishData.description = description);
+      oldWish.description !== description &&
+      (oldWish.description = description);
     return oldWish;
   }
 
-  _getNewPartialWishDto(wish: Wish): PartialWishDto {
+  getNewPartialWishDto(wish: Wish): PartialWishDto {
     return new PartialWishDto(
       wish.id,
       wish.name,
@@ -161,7 +152,7 @@ export class WishesService {
       wish.raised,
       wish.copied,
       wish.description,
-      this.usersService._getNewUserPublicProfileResponseDto(wish.owner),
+      this.usersService.getNewUserPublicProfileResponseDto(wish.owner),
       wish.offers,
       wish.wishlists,
     );
