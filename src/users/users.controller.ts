@@ -15,17 +15,27 @@ import { UserProfileResponseDto } from './dto/private-response-user.dto';
 import { UserPublicProfileResponseDto } from './dto/public-response-user.dto';
 import { FindIdUserDto } from './dto/find-id-user.dto';
 import { FindUserDto } from './dto/find-user.dto';
+import { WishResponseDto } from '../wishes/dto/response-wish.dto';
 import {
   USERS_PATH,
   ME_PATH,
   USERNAME_PATH,
   USERNAME_PARAM,
   FIND_PATH,
+  WISHES_PATH,
 } from '../utils/consts';
 
 @Controller(USERS_PATH)
 export class UsersController {
   constructor(private usersService: UsersService) {}
+
+  @UseGuards(JwtGuard)
+  @Get(`${ME_PATH}/${WISHES_PATH}`)
+  async getOwnerWishes(
+    @Request() req: Request & { user: FindIdUserDto },
+  ): Promise<Array<WishResponseDto>> {
+    return this.usersService.getWishesByUserId(req.user.id);
+  }
 
   @UseGuards(JwtGuard)
   @Patch(ME_PATH)
@@ -38,20 +48,29 @@ export class UsersController {
   }
 
   @UseGuards(JwtGuard)
-  @Get(`${USERNAME_PATH}`)
-  async getUserByName(
-    @Param(USERNAME_PARAM)
-    username: string,
-  ): Promise<UserPublicProfileResponseDto> {
-    return this.usersService.getByUsername(username);
-  }
-
-  @UseGuards(JwtGuard)
   @Get(ME_PATH)
   async getUserById(
     @Request() req: Request & { user: FindIdUserDto },
   ): Promise<UserProfileResponseDto> {
     return this.usersService.getById(req.user.id);
+  }
+
+  @UseGuards(JwtGuard)
+  @Get(`${USERNAME_PATH}/${WISHES_PATH}`)
+  async getWishesByUsername(
+    @Param(USERNAME_PARAM)
+    username: string,
+  ): Promise<Array<WishResponseDto>> {
+    return this.usersService.getWishesByUsername(username);
+  }
+
+  @UseGuards(JwtGuard)
+  @Get(USERNAME_PATH)
+  async getUserByName(
+    @Param(USERNAME_PARAM)
+    username: string,
+  ): Promise<UserPublicProfileResponseDto> {
+    return this.usersService.getByUsername(username);
   }
 
   @UseGuards(JwtGuard)

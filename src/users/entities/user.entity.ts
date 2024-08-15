@@ -30,7 +30,6 @@ export class User extends BaseEntity {
   password: string;
 
   @OneToMany(() => Wish, (wish) => wish.owner)
-  @JoinTable()
   @IsArray()
   wishes: Array<Wish>;
 

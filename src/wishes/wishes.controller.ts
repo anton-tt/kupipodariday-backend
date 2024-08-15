@@ -1,5 +1,6 @@
 import {
   Controller,
+  UseGuards,
   Headers,
   Request,
   Param,
@@ -7,42 +8,91 @@ import {
   Post,
   Get,
   Patch,
+  Delete,
 } from '@nestjs/common';
+import { JwtGuard } from '../auth/guards/jwt-auth';
 import { WishesService } from './wishes.service';
 import { CreateWishDto } from './dto/create-wish.dto';
 import { UpdateWishDto } from './dto/update-wish.dto';
 import { PartialWishDto } from '../wishes/dto/partial-wish.dto';
-import { WISHES_ROUT } from '../utils/consts';
-import { User } from '../users/entities/user.entity';
-/*import { UpdateUserDto } from './dto/update-user.dto';
-import { UserProfileResponseDto } from './dto/private-response-user.dto';
+import { FindIdUserDto } from '../users/dto/find-id-user.dto';
+import {
+  WISHES_PATH,
+  ID_PATH,
+  ID_PARAM,
+  LAST_PATCH,
+  TOP_PATCH,
+  COPY_PATH,
+} from '../utils/consts';
+import { WishResponseDto } from './dto/response-wish.dto';
+/*import { UserProfileResponseDto } from './dto/private-response-user.dto';
 import { UserPublicProfileResponseDto } from './dto/public-response-user.dto';
 import { FindIdUserDto } from './dto/find-id-user.dto';
 import { FindUserDto } from './dto/find-user.dto';
 import { SignupUserResponseDto } from './dto/signup-response-user.dto';*/
 
-@Controller(WISHES_ROUT)
+@Controller(WISHES_PATH)
 export class WishesController {
   constructor(private wishesService: WishesService) {}
 
+  @UseGuards(JwtGuard)
   @Post()
   async createWish(
-    /*@Request()
-    req: Request & { userId: number },*/
-    @Headers() id: number,
+    @Request() req: Request & { user: FindIdUserDto },
     @Body() wishData: CreateWishDto,
   ): Promise<PartialWishDto> {
-    return this.wishesService.create(id, wishData);
+    return this.wishesService.create(req.user.id, wishData);
   }
 
-  @Patch(':id')
+  @UseGuards(JwtGuard)
+  @Get(LAST_PATCH)
+  async getLastWish(
+    @Request() req: Request & { user: FindIdUserDto },
+  ): Promise<Array<WishResponseDto>> {
+    return this.wishesService.getLastWishResponseDto();
+  }
+
+  @UseGuards(JwtGuard)
+  @Get(TOP_PATCH)
+  async getTopWish(
+    @Request() req: Request & { user: FindIdUserDto },
+  ): Promise<Array<WishResponseDto>> {
+    return this.wishesService.getTopWishResponseDto();
+  }
+
+  @UseGuards(JwtGuard)
+  @Get(ID_PATH)
+  async getWishById(
+    @Param(ID_PARAM)
+    id: number,
+    @Request() req: Request & { user: FindIdUserDto },
+  ): Promise<WishResponseDto> {
+    return this.wishesService.getWishResponseDtoById(id, req.user.id);
+  }
+
+  @Patch(ID_PATH)
   async updateWish(
-    @Param('id') id: string,
-    /*@Request()
-    req: Request,*/
-    @Headers('user_id') userId: number,
+    @Param(ID_PARAM) id: number,
     @Body() wishData: UpdateWishDto,
   ): Promise<PartialWishDto> {
-    return this.wishesService.update(Number(id), wishData, userId);
+    return this.wishesService.update(id, wishData);
+  }
+
+  @UseGuards(JwtGuard)
+  @Delete(ID_PATH)
+  async deleteWish(
+    @Param(ID_PARAM) id: number,
+    @Request() req: Request & { user: FindIdUserDto },
+  ): Promise<PartialWishDto> {
+    return this.wishesService.delete(id, req.user.id);
+  }
+
+  @UseGuards(JwtGuard)
+  @Post(`${ID_PATH}/${COPY_PATH}`)
+  async copyWish(
+    @Param(ID_PARAM) id: number,
+    @Request() req: Request & { user: FindIdUserDto },
+  ): Promise<PartialWishDto> {
+    return this.wishesService.copy(id, req.user.id);
   }
 }

@@ -11,6 +11,8 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { UserProfileResponseDto } from './dto/private-response-user.dto';
 import { UserPublicProfileResponseDto } from './dto/public-response-user.dto';
 import { SignupUserResponseDto } from './dto/signup-response-user.dto';
+import { Wish } from '../wishes/entities/wish.entity';
+import { WishResponseDto } from '../wishes/dto/response-wish.dto';
 
 @Injectable()
 export class UsersService {
@@ -112,6 +114,48 @@ export class UsersService {
     }
   }
 
+  async getWishesByUserId(id: number): Promise<Array<WishResponseDto>> {
+    const user: User = await this.usersRepository.findOne({
+      where: { id },
+      relations: {
+        wishes: { owner: true },
+      },
+    });
+    if (!user) {
+      throw new NotFoundException('Пользователь с данным id не найден в БД.');
+    }
+    const wishes: Array<Wish> = user.wishes;
+    if (wishes.length === 0) {
+      throw new NotFoundException(
+        'У пользователя нет ниодного запроса на подарок.',
+      );
+    }
+    return wishes.map((wish) => {
+      return this._getNewWishResponseDto(wish);
+    });
+  }
+
+  async getWishesByUsername(username: string): Promise<Array<WishResponseDto>> {
+    const user: User = await this.usersRepository.findOne({
+      where: { username },
+      relations: {
+        wishes: { owner: true },
+      },
+    });
+    if (!user) {
+      throw new NotFoundException('Пользователь с данным id не найден в БД.');
+    }
+    const wishes: Array<Wish> = user.wishes;
+    if (wishes.length === 0) {
+      throw new NotFoundException(
+        'У пользователя нет ни одного запроса на подарок.',
+      );
+    }
+    return wishes.map((wish) => {
+      return this._getNewWishResponseDto(wish);
+    });
+  }
+
   _updateOldUser(userData: UpdateUserDto, oldUser: User): User {
     const { username, about, avatar, email, password } = userData;
     username && oldUser.username !== username && (oldUser.username = username);
@@ -146,6 +190,24 @@ export class UsersService {
       user.avatar,
       user.createdAt.toString(),
       user.updatedAt.toString(),
+    );
+  }
+
+  _getNewWishResponseDto(wish: Wish): WishResponseDto {
+    return new WishResponseDto(
+      wish.id,
+      wish.createdAt.toDateString(),
+      wish.updatedAt.toDateString(),
+      wish.name,
+      wish.link,
+      wish.image,
+      wish.price,
+      wish.raised,
+      wish.copied,
+      wish.description,
+      this._getNewUserPublicProfileResponseDto(wish.owner),
+      wish.offers,
+      wish.wishlists,
     );
   }
 }
