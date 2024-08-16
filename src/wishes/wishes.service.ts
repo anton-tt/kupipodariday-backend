@@ -3,14 +3,13 @@ import {
   ForbiddenException,
   NotFoundException,
 } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { Repository, In } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Wish } from './entities/wish.entity';
 import { CreateWishDto } from './dto/create-wish.dto';
 import { UpdateWishDto } from './dto/update-wish.dto';
 import { PartialWishDto } from '../wishes/dto/partial-wish.dto';
 import { UsersService } from '../users/users.service';
-import { User } from '../users/entities/user.entity';
 import { WishResponseDto } from './dto/response-wish.dto';
 
 @Injectable()
@@ -50,12 +49,8 @@ export class WishesService {
     return wish;
   }
 
-  async getWishResponseDtoById(
-    id: number,
-    userId: number,
-  ): Promise<WishResponseDto> {
+  async getWishResponseDtoById(id: number): Promise<WishResponseDto> {
     const wish: Wish = await this.getById(id);
-    const user: User = await this.usersService.getUserById(userId);
     return this._getNewWishResponseDto(wish);
   }
 
@@ -81,6 +76,18 @@ export class WishesService {
       skip: 0,
       take: 20,
     });
+    if (wishes.length === 0) {
+      throw new NotFoundException('Подарки по запросу не найдены в БД.');
+    }
+    return wishes.map((wish) => {
+      return this._getNewWishResponseDto(wish);
+    });
+  }
+
+  async getWishesResponseDtoById(
+    wishesId: Array<number>,
+  ): Promise<Array<WishResponseDto>> {
+    const wishes: Array<Wish> = await this.getAllWishesByIds(wishesId);
     if (wishes.length === 0) {
       throw new NotFoundException('Подарки по запросу не найдены в БД.');
     }
@@ -123,6 +130,13 @@ export class WishesService {
       oldWish.description !== description &&
       (oldWish.description = description);
     return oldWish;
+  }
+
+  async getAllWishesByIds(wishesId: Array<number>) {
+    return await this.wishesRepository.find({
+      where: { id: In(wishesId) },
+      relations: { owner: true },
+    });
   }
 
   getNewPartialWishDto(wish: Wish): PartialWishDto {

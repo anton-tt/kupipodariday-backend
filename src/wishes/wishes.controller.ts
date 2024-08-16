@@ -55,9 +55,8 @@ export class WishesController {
   async getWishById(
     @Param(ID_PARAM)
     id: number,
-    @Request() req: Request & { user: FindIdUserDto },
   ): Promise<WishResponseDto> {
-    return this.wishesService.getWishResponseDtoById(id, req.user.id);
+    return this.wishesService.getWishResponseDtoById(id);
   }
 
   @Patch(ID_PATH)

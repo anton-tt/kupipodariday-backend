@@ -1,4 +1,4 @@
-import { Entity, Column, OneToMany, JoinTable } from 'typeorm';
+import { Entity, Column, OneToMany } from 'typeorm';
 import { Length, IsString, IsUrl, IsEmail, IsArray } from 'class-validator';
 import { BaseEntity } from '../../utils/base.entity';
 import { Wish } from '../../wishes/entities/wish.entity';
@@ -38,7 +38,6 @@ export class User extends BaseEntity {
   offers: Array<Offer>;
 
   @OneToMany(() => Wishlist, (wishlist) => wishlist.owner)
-  @JoinTable()
   @IsArray()
   wishlists: Array<Wishlist>;
 }

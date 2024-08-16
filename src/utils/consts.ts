@@ -16,3 +16,5 @@ export const TOP_PATCH = 'top';
 export const COPY_PATH = 'copy';
 
 export const OFFERS_PATH = 'offers';
+
+export const WISHLISTS_PATH = 'wishlistlists';
