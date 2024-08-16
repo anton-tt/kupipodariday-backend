@@ -1,5 +1,6 @@
 import {
   Injectable,
+  ForbiddenException,
   ConflictException,
   NotFoundException,
 } from '@nestjs/common';
@@ -32,6 +33,11 @@ export class UsersService {
     userData: UpdateUserDto,
   ): Promise<UserProfileResponseDto> {
     const oldUser: User = await this.getUserById(id);
+    if (id !== oldUser.id) {
+      throw new ForbiddenException(
+        'Обновить информацию о пользователе может только сам пользователь.',
+      );
+    }
     await this._checkNameAndEmailUser(userData);
     this._updateOldUser(userData, oldUser);
     const user: User = await this.usersRepository.save(oldUser);

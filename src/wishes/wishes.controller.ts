@@ -62,9 +62,10 @@ export class WishesController {
   @Patch(ID_PATH)
   async updateWish(
     @Param(ID_PARAM) id: number,
+    @Request() req: Request & { user: FindIdUserDto },
     @Body() wishData: UpdateWishDto,
   ): Promise<PartialWishDto> {
-    return this.wishesService.update(id, wishData);
+    return this.wishesService.update(id, wishData, req.user.id);
   }
 
   @UseGuards(JwtGuard)

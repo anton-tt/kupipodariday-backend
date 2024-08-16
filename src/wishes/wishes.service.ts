@@ -31,8 +31,13 @@ export class WishesService {
     return this.getNewPartialWishDto(wish);
   }
 
-  async update(id: number, wishData: UpdateWishDto): Promise<PartialWishDto> {
+  async update(
+    id: number,
+    wishData: UpdateWishDto,
+    userId: number,
+  ): Promise<PartialWishDto> {
     let oldWish: Wish = await this.getById(id);
+    this._isOwner(oldWish.owner.id, userId);
     oldWish = this._updateOldWish(wishData, oldWish);
     const wish: Wish = await this.wishesRepository.save(oldWish);
     return this.getNewPartialWishDto(wish);
@@ -98,15 +103,18 @@ export class WishesService {
 
   async delete(id: number, userId: number): Promise<WishResponseDto> {
     const wish: Wish = await this.getById(id);
-    if (userId !== wish.owner.id) {
-      throw new ForbiddenException('Нельзя удалить чужой подарок.');
-    }
+    this._isOwner(wish.owner.id, userId);
     this.wishesRepository.delete(id);
     return this._getNewWishResponseDto(wish);
   }
 
   async copy(id: number, userId: number): Promise<PartialWishDto> {
     const wish: Wish = await this.getById(id);
+    if (wish.owner.id === userId) {
+      throw new ForbiddenException(
+        'Подарок создан тем же пользователем, который отправил запрос на его копирование.',
+      );
+    }
     let newWish = this.wishesRepository.create({
       ...wish,
       id: null,
@@ -170,5 +178,13 @@ export class WishesService {
       wish.offers,
       wish.wishlists,
     );
+  }
+
+  _isOwner(ownerId: number, userId: number): void {
+    if (ownerId !== userId) {
+      throw new ForbiddenException(
+        'Пользователь не является владельцем, операцию нельзя выполнить.',
+      );
+    }
   }
 }
