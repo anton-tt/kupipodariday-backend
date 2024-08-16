@@ -40,7 +40,7 @@ export class OffersService {
 
     const newRaised = Number(wish.raised) + Number(offerData.amount);
     wish.raised = newRaised;
-    await this.wishesService.update(wish.id, wish);
+    await this.wishesService.update(wish.id, wish, wish.owner.id);
 
     const offer: Offer = await this.offersRepository.save({
       ...offerData,
